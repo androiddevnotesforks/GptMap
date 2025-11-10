@@ -14,7 +14,7 @@ import com.espressodev.gptmap.core.model.Response
 import com.espressodev.gptmap.core.model.ScreenshotGalleryUiState
 import com.espressodev.gptmap.core.model.di.Dispatcher
 import com.espressodev.gptmap.core.model.di.GmDispatchers.IO
-import com.espressodev.gptmap.core.mongodb.ImageAnalysisRealmRepository
+import com.espressodev.gptmap.core.room.domain.repository.ImageAnalysisRoomRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,13 +29,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ScreenshotGalleryViewModel @Inject constructor(
-    private val imageAnalysisRealmRepository: ImageAnalysisRealmRepository,
+    private val imageAnalysisRoomRepository: ImageAnalysisRoomRepository,
     private val fileRepository: FileRepository,
     logService: LogService,
-    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
+    @param:Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
     private val imageAnalysisRepository: ImageAnalysisRepository,
 ) : GmViewModel(logService) {
-    val imageAnalyses = imageAnalysisRealmRepository
+    val imageAnalyses = imageAnalysisRoomRepository
         .getImageAnalyses()
         .map<List<ImageAnalysis>, Response<List<ImageSummary>>> {
             Response.Success(
@@ -125,7 +125,7 @@ class ScreenshotGalleryViewModel @Inject constructor(
 
     private fun onEditDialogConfirmClick(text: String) = launchCatching {
         withContext(ioDispatcher) {
-            imageAnalysisRealmRepository.updateImageAnalysisText(imageSummaryId, text).getOrThrow()
+            imageAnalysisRoomRepository.updateImageAnalysisText(imageSummaryId, text).getOrThrow()
         }
         reset()
     }

@@ -26,7 +26,7 @@ object GeminiModule {
         temperature = 0.8f
         topK = 16
         topP = 0.1f
-        maxOutputTokens = 200
+        maxOutputTokens = 3000
         stopSequences = listOf("red")
     }
 
@@ -34,7 +34,7 @@ object GeminiModule {
     @Singleton
     @Provides
     fun provideGenerativeModelForText(): GenerativeModel = GenerativeModel(
-        modelName = "gemini-pro",
+        modelName = "gemini-flash-latest",
         apiKey = PALM_API_KEY,
         safetySettings = listOf(harassmentSafety, hateSpeechSafety)
     )
@@ -43,7 +43,7 @@ object GeminiModule {
     @Singleton
     @Provides
     fun provideGenerativeModelForImage(): GenerativeModel = GenerativeModel(
-        modelName = "gemini-pro-vision",
+        modelName = "gemini-flash-latest",
         apiKey = PALM_API_KEY,
         safetySettings = listOf(harassmentSafety, hateSpeechSafety),
         generationConfig = config

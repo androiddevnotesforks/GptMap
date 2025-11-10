@@ -1,8 +1,6 @@
 package com.espressodev.gptmap.navigation
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
@@ -100,29 +98,9 @@ fun GmNavHost(
             }
         )
     }
-
-    // Debug purposes
-    // navController.NavigationListener()
 }
 
 fun NavHostController.safePopBackStack() {
     if (currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED)
         popBackStack()
-}
-
-@SuppressLint("RestrictedApi")
-@Composable
-private fun NavHostController.NavigationListener() {
-    LaunchedEffect(this) {
-        this@NavigationListener.addOnDestinationChangedListener { controller, destination, arguments ->
-            println("Current back stack: ${destination.route}")
-            println("Parent back stack: ${controller.previousBackStackEntry?.destination}")
-            println("Arguments: $arguments")
-        }
-        this@NavigationListener.currentBackStack.collect {
-            it.forEach { backStackEntry ->
-                println("Back stack: ${backStackEntry.destination.route}")
-            }
-        }
-    }
 }

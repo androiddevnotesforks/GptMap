@@ -37,7 +37,7 @@ firebaseBom = "32.8.1"
 firebaseCrashlyticsPlugin = "2.9.9"
 firebaseStorage = "20.3.0"
 fixture = "1.2.0"
-generativeai = "0.2.2"
+generativeai = "0.9.0"
 gmsPlugin = "4.4.1"
 googleGson = "2.10.1"
 googleId = "1.1.0"
@@ -73,6 +73,7 @@ realm = "1.13.0"
 retrofit = "2.11.0"
 robolectric = "4.11.1"
 roborazzi = "1.6.0"
+room = "2.6.0"
 secrets = "2.0.1"
 timber = "5.0.1"
 turbine = "1.0.0"
@@ -89,6 +90,9 @@ androidx-compose-foundation-layout = { group = "androidx.compose.foundation", na
 androidx-compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils = { group = "com.google.maps.android", name = "maps-compose-utils", version.ref = "mapsCompose" }
 maps-compose-widgets = { group = "com.google.maps.android", name = "maps-compose-widgets", version.ref = "mapsCompose" }

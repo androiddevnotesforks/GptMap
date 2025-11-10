@@ -4,7 +4,6 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.espressodev.gptmap.core.firebase.AccountService
-import com.espressodev.gptmap.core.mongodb.RealmAccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +21,6 @@ enum class AccountState {
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     private val accountService: AccountService,
-    private val realmAccountRepository: RealmAccountRepository,
 ) : ViewModel() {
     private val _accountState = MutableStateFlow(AccountState.Loading)
     val accountState = _accountState.asStateFlow()
@@ -37,7 +35,6 @@ class MainActivityViewModel @Inject constructor(
             runCatching {
                 if (accountService.isEmailVerified) {
                     accountService.firebaseUser?.getIdToken(true)?.await()?.token?.let {
-                        realmAccountRepository.loginWithEmail(it).getOrThrow()
                         _accountState.update { AccountState.UserAlreadySignIn }
                     }
                 } else {

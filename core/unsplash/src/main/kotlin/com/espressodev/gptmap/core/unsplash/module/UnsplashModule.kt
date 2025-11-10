@@ -1,6 +1,7 @@
 package com.espressodev.gptmap.core.unsplash.module
 
 import android.util.Log
+import com.espressodev.gptmap.core.unsplash.BuildConfig
 import com.espressodev.gptmap.core.unsplash.BuildConfig.UNSPLASH_BASE_URL
 import com.espressodev.gptmap.core.unsplash.UnsplashApi
 import com.espressodev.gptmap.core.unsplash.UnsplashRepository
@@ -13,7 +14,9 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -24,29 +27,8 @@ object UnsplashModule {
     @ViewModelScoped
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val request = chain.request()
-                val newRequestBuilder = request.newBuilder()
-                    .addHeader("Content-Type", "application/json")
-
-                val token = runBlocking { getFirebaseToken() }
-
-                if (token != null) {
-                    newRequestBuilder.addHeader("Authorization", "Bearer $token")
-                }
-
-                chain.proceed(newRequestBuilder.build())
-            }
+            .addInterceptor(UnsplashAuthInterceptor())
             .build()
-    }
-
-    private suspend fun getFirebaseToken(): String? {
-        return try {
-            FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.await()?.token
-        } catch (e: Exception) {
-            Log.e("UnsplashModule", "getFirebaseToken: ", e)
-            null
-        }
     }
 
     @ViewModelScoped
@@ -64,4 +46,15 @@ object UnsplashModule {
     @ViewModelScoped
     fun provideUnsplashDataSource(unsplashApi: UnsplashApi): UnsplashRepository =
         UnsplashRepositoryImpl(unsplashApi)
+}
+
+
+class UnsplashAuthInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val originalRequest = chain.request()
+        val requestWithAuth = originalRequest.newBuilder()
+            .addHeader("Authorization", "Client-ID ${BuildConfig.ACCESS_KEY}")
+            .build()
+        return chain.proceed(requestWithAuth)
+    }
 }

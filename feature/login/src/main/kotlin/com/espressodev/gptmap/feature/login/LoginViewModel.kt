@@ -79,7 +79,7 @@ class LoginViewModel @Inject constructor(
     private fun googleSignIn(context: Context) = launchCatching {
         authenticationRepository.signInUpWithGoogle(context).collect { authState ->
             when (authState) {
-                is AuthState.Error -> println(authState.e)
+                is AuthState.Error -> if(BuildConfig.DEBUG) println(authState.e)
                 AuthState.Idle -> Unit
                 AuthState.Loading -> _uiState.update { it.copy(loadingState = LoadingState.Loading) }
                 is AuthState.Success -> {

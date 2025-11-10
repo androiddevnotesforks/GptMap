@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.mongodb)
+    implementation(projects.core.room)
 
     implementation(libs.coil.compose)
 }

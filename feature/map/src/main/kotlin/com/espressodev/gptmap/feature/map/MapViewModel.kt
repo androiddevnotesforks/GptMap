@@ -30,7 +30,7 @@ class MapViewModel @Inject constructor(
     private val apiService: ApiService,
     private val repositoryBundle: RepositoryBundle,
     private val dataBundle: DataBundle,
-    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
+    @param:Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
     private val savedStateHandle: SavedStateHandle,
     logService: LogService,
     private val screenshotServiceHandler: ScreenshotServiceHandler,
@@ -50,7 +50,7 @@ class MapViewModel @Inject constructor(
     private var initializeCalled = false
 
     @MainThread
-    suspend fun initialize() {
+    fun initialize() {
         ThreadUtil.ensureMainThread()
         if (initializeCalled) return
         initializeCalled = true
@@ -59,7 +59,6 @@ class MapViewModel @Inject constructor(
             launch { getFirstLetterOfUser() }
             launch { observeFavouriteIdFromBackStack() }
             launch { collectScreenshotState() }
-            launch { repositoryBundle.userRepository.addIfNewUser() }
         }
     }
 
@@ -224,24 +223,23 @@ class MapViewModel @Inject constructor(
                             _uiState.update { it.copy(location = location.copy(locationImages = locationImages)) }
                         }
                 }
-            }.onFailure {
+            }.onFailure { throwable ->
                 _uiState.update { it.copy(componentLoadingState = ComponentLoadingState.NOTHING) }
             }
     }
 
     private fun onFavouriteClick() = launchCatching {
-        uiState.value.location.also { location ->
-            _uiState.update { state ->
-                state.copy(location = state.location.copy(isAddedToFavourite = false))
-            }
-            repositoryBundle.favouriteRepository.saveImageForLocation(location)
-                .onFailure {
-                    _uiState.update { state ->
-                        state.copy(location = state.location.copy(isAddedToFavourite = true))
-                    }
-                    throw it
-                }
+        val location = uiState.value.location
+        _uiState.update { state ->
+            state.copy(location = state.location.copy(isAddedToFavourite = false))
         }
+        repositoryBundle.favouriteRepository.saveImageForLocation(location)
+            .onFailure {
+                _uiState.update { state ->
+                    state.copy(location = state.location.copy(isAddedToFavourite = true))
+                }
+                throw it
+            }
     }
 
     fun reset() {
@@ -287,7 +285,7 @@ class MapViewModel @Inject constructor(
     private fun loadLocationFromFavourite(favouriteId: String) = launchCatching {
         val location = withContext(ioDispatcher) {
             dataBundle.favouriteRealmRepository.getFavourite(favouriteId)
-        }.toLocation()
+        }?.toLocation() ?: return@launchCatching
 
         _uiState.update {
             it.copy(

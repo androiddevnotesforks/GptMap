@@ -427,7 +427,6 @@ private fun MapUiState.MapCameraSection(
             if (!mapMyLocationState.isFirstTimeFetched) {
                 onLocationEvent(MapLocationEvent.OnWhenNavigateToMyLocation)
             }
-            animateCameraState = false
         }
     }
 

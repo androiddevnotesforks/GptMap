@@ -5,10 +5,9 @@ import java.time.LocalDateTime
 data class ImageAnalysis(
     val id: String = "",
     val imageId: String = "",
-    val userId: String = "",
     val imageUrl: String = "",
     val title: String = "",
-    var imageType: String = ImageType.Screenshot.name,
+    val imageType: String = ImageType.Screenshot.name,
     val messages: List<ImageMessage> = listOf(),
     val date: LocalDateTime = LocalDateTime.MIN
 ) {

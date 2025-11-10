@@ -22,7 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StreetViewViewModel @Inject constructor(
-    @ApplicationContext private val applicationContext: Context,
+    @param:ApplicationContext private val applicationContext: Context,
     logService: LogService,
     savedStateHandle: SavedStateHandle
 ) : GmViewModel(logService) {

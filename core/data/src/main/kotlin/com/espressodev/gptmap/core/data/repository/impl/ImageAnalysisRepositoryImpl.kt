@@ -11,6 +11,7 @@ import com.espressodev.gptmap.core.data.worker.DeleteImagesFromStorageAndPhoneWo
 import com.espressodev.gptmap.core.datastore.DataStoreService
 import com.espressodev.gptmap.core.firebase.StorageRepository
 import com.espressodev.gptmap.core.model.Constants
+import com.espressodev.gptmap.core.model.ImageAnalysis
 import com.espressodev.gptmap.core.model.ImageType
 import com.espressodev.gptmap.core.model.di.Dispatcher
 import com.espressodev.gptmap.core.model.di.GmDispatchers.IO
@@ -19,22 +20,22 @@ import com.espressodev.gptmap.core.model.ext.downloadResizeAndCompress
 import com.espressodev.gptmap.core.model.ext.resizeImage
 import com.espressodev.gptmap.core.model.ext.saveToInternalStorageIfNotExist
 import com.espressodev.gptmap.core.model.ext.toBitmap
-import com.espressodev.gptmap.core.model.realm.RealmImageAnalysis
-import com.espressodev.gptmap.core.mongodb.FavouriteRealmRepository
-import com.espressodev.gptmap.core.mongodb.ImageAnalysisRealmRepository
+import com.espressodev.gptmap.core.room.domain.repository.FavouriteRoomRepository
+import com.espressodev.gptmap.core.room.domain.repository.ImageAnalysisRoomRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 
 class ImageAnalysisRepositoryImpl @Inject constructor(
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
-    private val imageAnalysisRealmRepository: ImageAnalysisRealmRepository,
+    private val imageAnalysisRoomRepository: ImageAnalysisRoomRepository,
     private val dataStoreService: DataStoreService,
-    private val favouriteRealmRepository: FavouriteRealmRepository,
+    private val favouriteRoomRepository: FavouriteRoomRepository,
     private val storageRepository: StorageRepository
 ) : ImageAnalysisRepository {
     override suspend fun deleteImageAnalyses(imageIds: Set<String>): Result<Unit> =
@@ -42,7 +43,7 @@ class ImageAnalysisRepositoryImpl @Inject constructor(
             updateDataStoreIfNecessary(imageIds)
 
             val deleteFromRealmJob = launch {
-                imageAnalysisRealmRepository.deleteImageAnalyses(imageIds).getOrThrow()
+                imageAnalysisRoomRepository.deleteImageAnalyses(imageIds).getOrThrow()
             }
             deleteFromRealmJob.join()
 
@@ -52,7 +53,6 @@ class ImageAnalysisRepositoryImpl @Inject constructor(
                 .setInputData(inputData)
                 .build()
             WorkManager.getInstance(context).enqueue(workRequest)
-            Unit
         }
 
     private suspend fun updateDataStoreIfNecessary(imageIds: Set<String>) =
@@ -66,7 +66,7 @@ class ImageAnalysisRepositoryImpl @Inject constructor(
                     dataStoreService.setLatestImageUrl("")
                 }
                 launch {
-                    favouriteRealmRepository.resetImageAnalysisId(latestImageIdForChat)
+                    favouriteRoomRepository.resetImageAnalysisId(latestImageIdForChat)
                 }
             }
         }
@@ -114,22 +114,25 @@ class ImageAnalysisRepositoryImpl @Inject constructor(
             imageId,
             StorageRepository.ANALYSIS_IMAGE_REFERENCE
         ).getOrThrow()
-        saveImageAnalysisToRealm(imageId, imageUrl, title, imageType)
+        saveImageAnalysisToRoom(imageId, imageUrl, title, imageType)
         imageId
     }
 
-    private suspend fun saveImageAnalysisToRealm(
+    private suspend fun saveImageAnalysisToRoom(
         imageId: String,
         imageUrl: String,
         title: String,
         imageType: ImageType
     ) {
-        val realmImageAnalysis = RealmImageAnalysis().apply {
-            this.imageId = imageId
-            this.imageUrl = imageUrl
-            this.title = title
-            this.imageType = imageType.name
-        }
-        imageAnalysisRealmRepository.saveImageAnalysis(realmImageAnalysis).getOrThrow()
+        val imageAnalysis = ImageAnalysis(
+            id = UUID.randomUUID().toString(),
+            imageId = imageId,
+            imageUrl = imageUrl,
+            title = title,
+            imageType = imageType.name,
+            messages = emptyList(),
+            date = LocalDateTime.now()
+        )
+        imageAnalysisRoomRepository.saveImageAnalysis(imageAnalysis).getOrThrow()
     }
 }

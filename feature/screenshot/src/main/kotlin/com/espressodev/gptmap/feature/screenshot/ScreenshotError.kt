@@ -1,7 +1,6 @@
 package com.espressodev.gptmap.feature.screenshot
 
 import android.app.Activity
-import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
 import android.view.PixelCopy
@@ -10,6 +9,7 @@ import androidx.compose.ui.geometry.Rect
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import androidx.core.graphics.createBitmap
 
 sealed class ScreenshotError(message: String) : Exception(message) {
     class DestinationInvalidError : ScreenshotError("The destination isn't a valid copy target.")
@@ -24,11 +24,7 @@ sealed class ScreenshotError(message: String) : Exception(message) {
 suspend fun View.screenshot(bounds: Rect): ImageResult =
     suspendCancellableCoroutine { continuation ->
         try {
-            val bitmap = Bitmap.createBitmap(
-                bounds.width.toInt(),
-                bounds.height.toInt(),
-                Bitmap.Config.ARGB_8888
-            )
+            val bitmap = createBitmap(bounds.width.toInt(), bounds.height.toInt())
 
             // if it's a fragment, it can throw an error. We are using it in compose, so it's an activity
             PixelCopy.request(

@@ -21,8 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -105,11 +107,20 @@ fun GmBottomNavigation(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
     ) {
+        var lastClickTime by remember { mutableLongStateOf(0L) }
+
         for (destination in destinations) {
             val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
+
             GmNavigationBarItem(
                 selected = selected,
-                onClick = { onNavigateToDestination(destination) },
+                onClick = {
+                    val currentTime = System.currentTimeMillis()
+                    if (currentTime - lastClickTime >= 500) {
+                        lastClickTime = currentTime
+                        onNavigateToDestination(destination)
+                    }
+                },
                 icon = {
                     Icon(
                         imageVector = destination.unSelectedIcon,

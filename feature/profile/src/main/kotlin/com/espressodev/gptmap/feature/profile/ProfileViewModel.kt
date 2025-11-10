@@ -11,7 +11,6 @@ import com.espressodev.gptmap.core.model.Response
 import com.espressodev.gptmap.core.model.di.Dispatcher
 import com.espressodev.gptmap.core.model.di.GmDispatchers.IO
 import com.espressodev.gptmap.core.model.firebase.User
-import com.espressodev.gptmap.core.mongodb.RealmAccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -28,7 +27,6 @@ import kotlin.coroutines.cancellation.CancellationException
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val accountService: AccountService,
-    private val realmAccountRepository: RealmAccountRepository,
     private val dataStoreService: DataStoreService,
     firestoreRepository: FirestoreRepository,
     logService: LogService,
@@ -62,7 +60,6 @@ class ProfileViewModel @Inject constructor(
     fun onLogoutClick(navigate: () -> Unit) = launchCatching {
         dataStoreService.clear()
         accountService.signOut()
-        realmAccountRepository.logOut()
         navigate()
     }
 
