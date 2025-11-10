@@ -12,7 +12,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.mongodb)
+    implementation(projects.core.room)
     implementation(projects.core.firebase)
     testImplementation(projects.core.testing)
 

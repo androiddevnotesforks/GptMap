@@ -25,7 +25,7 @@ import com.espressodev.gptmap.core.designsystem.R.string as AppText
 class VerifyAuthViewModel @Inject constructor(
     private val accountService: AccountService,
     private val firestoreRepository: FirestoreRepository,
-    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
+    @param:Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
     logService: LogService,
 ) : GmViewModel(logService) {
 

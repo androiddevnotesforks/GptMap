@@ -10,7 +10,7 @@ android {
 dependencies {
     implementation(projects.core.model)
     implementation(projects.core.firebase)
-    implementation(projects.core.mongodb)
+    implementation(projects.core.room)
     implementation(projects.core.datastore)
     implementation(projects.core.gemini)
     implementation(projects.core.google)

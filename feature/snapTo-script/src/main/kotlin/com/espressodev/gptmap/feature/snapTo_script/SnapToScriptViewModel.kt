@@ -15,7 +15,7 @@ import com.espressodev.gptmap.core.model.ImageType
 import com.espressodev.gptmap.core.model.di.Dispatcher
 import com.espressodev.gptmap.core.model.di.GmDispatchers.IO
 import com.espressodev.gptmap.core.model.ext.toImageType
-import com.espressodev.gptmap.core.mongodb.ImageMessageRealmRepository
+import com.espressodev.gptmap.core.room.domain.repository.ImageMessageRoomRepository
 import com.espressodev.gptmap.feature.screenshot_gallery.InputSelector
 import com.espressodev.gptmap.feature.screenshot_gallery.SnapToScriptUiEvent
 import com.espressodev.gptmap.feature.screenshot_gallery.SnapToScriptUiState
@@ -40,7 +40,7 @@ class SnapToScriptViewModel @Inject constructor(
     private val imageMessageRepository: ImageMessageRepository,
     private val userRepository: UserRepository,
     private val dataStoreService: DataStoreService,
-    imageMessageRealmRepository: ImageMessageRealmRepository,
+    imageMessageRealmRepository: ImageMessageRoomRepository,
     @Dispatcher(IO) ioDispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle,
     logService: LogService

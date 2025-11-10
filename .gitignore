@@ -15,7 +15,6 @@ captures/
 .cxx/
 *.apk
 output.json
-gradle.properties
 gradlew.bat
 app/src/release/generated/baselineProfiles/*
 

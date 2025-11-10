@@ -30,7 +30,6 @@ fun rememberKeyboardAsState(): State<KeyboardState> {
 
             // Check if the keypad height has changed since the last time we checked
             if (keypadHeight != lastKeypadHeight) {
-                lastKeypadHeight = keypadHeight
                 val isKeyboardOpen = keypadHeight > screenHeight * 0.15
                 val keypadHeightDp = with(density) { keypadHeight.toDp() }
                 keyboardState.value = KeyboardState(isKeyboardOpen, keypadHeightDp)

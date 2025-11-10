@@ -15,25 +15,23 @@ import java.util.UUID
 class UnsplashRepositoryImpl(private val unsplashApi: UnsplashApi) : UnsplashRepository {
     override suspend fun getTwoPhotos(query: String): Result<List<LocationImage>> =
         withContext(Dispatchers.IO) {
-            val response = unsplashApi.getTwoPhotos(query)
-            response.isSuccessful.let { success ->
-                when {
-                    success -> {
-                        response.body()?.let { images ->
-                            val notNullImages = images.map {
-                                it.copy(
-                                    id = UUID.randomUUID().toString(),
-                                    analysisId = ""
-                                )
-                            }
-                            Result.success(notNullImages)
-                        } ?: Result.failure(Throwable(UnsplashApiException()))
-                    }
+            try {
+                val response = unsplashApi.getTwoPhotos(query)
+                val images = response.toLocationImageList()
 
-                    else -> {
-                        Result.failure(Throwable(UnsplashApiException()))
+                if (images.isEmpty()) {
+                    Result.failure(Throwable(UnsplashApiException()))
+                } else {
+                    val notNullImages = images.map {
+                        it.copy(
+                            id = UUID.randomUUID().toString(),
+                            analysisId = ""
+                        )
                     }
+                    Result.success(notNullImages)
                 }
+            } catch (_: Exception) {
+                Result.failure(Throwable(UnsplashApiException()))
             }
         }
 

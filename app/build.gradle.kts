@@ -1,6 +1,3 @@
-import java.io.FileInputStream
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.gptmap.android.application)
     alias(libs.plugins.gptmap.android.application.compose)
@@ -24,26 +21,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-
-    val keystorePropertiesFile = rootProject.file("keystore.properties")
-    val keystoreProperties = Properties()
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-
-    signingConfigs {
-        create("config") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
-            storePassword = keystoreProperties["storePassword"] as String
-        }
-    }
-
-
     buildTypes {
         getByName("debug") {
-            signingConfig = signingConfigs.getByName("config")
+            isMinifyEnabled = false
         }
-
 
         getByName("release") {
             isMinifyEnabled = true
@@ -52,7 +33,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("config")
         }
     }
 
@@ -97,7 +77,7 @@ dependencies {
     implementation(projects.core.firebase)
     implementation(projects.core.data)
     implementation(projects.core.domain)
-    implementation(projects.core.mongodb)
+    implementation(projects.core.room)
     implementation(projects.core.saveScreenshot)
 
     implementation(libs.androidx.navigation.compose)
@@ -105,7 +85,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.androidx.work.ktx)
     implementation(libs.hilt.ext.work)
-    debugImplementation(libs.leakcanary)
     implementation(libs.androidx.profileinstaller)
     baselineProfile(projects.benchmarks)
     implementation(libs.timber)

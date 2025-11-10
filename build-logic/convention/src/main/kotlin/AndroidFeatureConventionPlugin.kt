@@ -20,7 +20,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 implementation(project(":core:data"))
                 implementation(project(":core:common"))
                 implementation(project(":core:domain"))
-                implementation(project(":core:mongodb"))
+                implementation(project(":core:room"))
 
                 implementation(libs.findLibrary("androidx-hilt-navigation-compose").get())
                 implementation(libs.findLibrary("androidx-lifecycle-runtimeCompose").get())

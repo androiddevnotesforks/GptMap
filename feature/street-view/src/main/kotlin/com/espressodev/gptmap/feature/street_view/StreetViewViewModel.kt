@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Build
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.espressodev.gptmap.core.common.GmViewModel
 import com.espressodev.gptmap.core.common.LogService
 import com.espressodev.gptmap.core.save_screenshot.SaveScreenshotService
@@ -22,13 +23,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StreetViewViewModel @Inject constructor(
-    @ApplicationContext private val applicationContext: Context,
+    @param:ApplicationContext private val applicationContext: Context,
     logService: LogService,
     savedStateHandle: SavedStateHandle
 ) : GmViewModel(logService) {
 
-    private val latitude: Float = checkNotNull(savedStateHandle[LATITUDE_ID])
-    private val longitude: Float = checkNotNull(savedStateHandle[LONGITUDE_ID])
+    private val streetView: StreetView = savedStateHandle.toRoute<StreetView>()
+    private val latitude: Float = streetView.latitude
+    private val longitude: Float = streetView.longitude
 
     private val _uiState = MutableStateFlow(
         StreetViewUiState(

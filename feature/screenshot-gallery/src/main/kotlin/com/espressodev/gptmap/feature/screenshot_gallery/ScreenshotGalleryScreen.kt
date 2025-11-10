@@ -194,7 +194,8 @@ private fun ScreenshotGalleryScreen(
         GalleryView(
             images = images,
             currentPage = currentPage,
-            onDismiss = { setDialogState(false) }
+            onDismiss = { setDialogState(false) },
+            navigate = navigate
         )
     }
     LazyVerticalGrid(
@@ -285,6 +286,7 @@ private fun GalleryView(
     images: List<ImageSummary>,
     currentPage: Int,
     onDismiss: () -> Unit,
+    navigate: (imageId: String, imageUrl: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(initialPage = currentPage, pageCount = { images.size })
@@ -321,7 +323,9 @@ private fun GalleryView(
                         }
                         .aspectRatio(1f)
                 ) {
-                    ImageCard(imageSummary = images[page])
+                    ImageCard(
+                        imageSummary = images[page],
+                        exploreWithAiClick = { navigate(images[page].id, images[page].imageUrl) })
                 }
             }
             DotsIndicator(

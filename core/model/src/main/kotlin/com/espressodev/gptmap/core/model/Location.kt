@@ -1,9 +1,9 @@
 package com.espressodev.gptmap.core.model
 
 import androidx.compose.runtime.Stable
-import com.espressodev.gptmap.core.model.realm.RealmFavourite
 import com.espressodev.gptmap.core.model.unsplash.LocationImage
-import io.realm.kotlin.ext.toRealmList
+import java.time.LocalDateTime
+import java.util.UUID
 
 @Stable
 data class Location(
@@ -14,13 +14,6 @@ data class Location(
     val favouriteId: String
 )
 
-fun Location.toRealmFavourite(): RealmFavourite = RealmFavourite().apply {
-    favouriteId = this@Location.id
-    content = this@Location.content.toRealmContent()
-    locationImages =
-        this@Location.locationImages.map { it.toRealmLocationImage() }.toRealmList()
-}
-
 val locationDefault: Location =
     Location(
         id = "", content = Content(),
@@ -28,3 +21,13 @@ val locationDefault: Location =
         isAddedToFavourite = true,
         favouriteId = ""
     )
+
+fun Location.toFavourite(placeholderImageUrl: String = ""): Favourite = Favourite(
+    id = id.ifEmpty { UUID.randomUUID().toString() },
+    favouriteId = favouriteId.ifEmpty { UUID.randomUUID().toString() },
+    title = content.city.ifEmpty { content.country },
+    placeholderImageUrl = placeholderImageUrl,
+    locationImages = locationImages,
+    content = content,
+    date = LocalDateTime.now()
+)

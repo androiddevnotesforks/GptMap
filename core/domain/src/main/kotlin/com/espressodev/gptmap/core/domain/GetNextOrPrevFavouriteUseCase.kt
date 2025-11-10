@@ -4,7 +4,7 @@ import com.espressodev.gptmap.core.model.Coordinates
 import com.espressodev.gptmap.core.model.Favourite
 import com.espressodev.gptmap.core.model.di.Dispatcher
 import com.espressodev.gptmap.core.model.di.GmDispatchers.IO
-import com.espressodev.gptmap.core.mongodb.FavouriteRealmRepository
+import com.espressodev.gptmap.core.room.domain.repository.FavouriteRoomRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -16,12 +16,12 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 class GetNextOrPrevFavouriteUseCase @Inject constructor(
-    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
-    private val favouriteRealmRepository: FavouriteRealmRepository,
+    @param:Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
+    private val favouriteRepository: FavouriteRoomRepository,
 ) {
     suspend operator fun invoke(favouriteId: String, isNext: Boolean) = withContext(ioDispatcher) {
         runCatching {
-            val favourites = favouriteRealmRepository.getFavourites().first()
+            val favourites = favouriteRepository.getFavourites().first()
             val favourite = favourites.firstOrNull { it.favouriteId == favouriteId }
             val (leftFavourite, rightFavourite) = favourite?.findClosestFavourites(favourites)
                 ?: Pair(null, null)

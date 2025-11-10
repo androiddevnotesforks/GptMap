@@ -6,32 +6,38 @@ import com.espressodev.gptmap.core.data.util.runCatchingWithContext
 import com.espressodev.gptmap.core.gemini.GeminiRepository
 import com.espressodev.gptmap.core.model.Constants
 import com.espressodev.gptmap.core.model.Exceptions
+import com.espressodev.gptmap.core.model.ImageMessage
 import com.espressodev.gptmap.core.model.di.Dispatcher
 import com.espressodev.gptmap.core.model.di.GmDispatchers.IO
 import com.espressodev.gptmap.core.model.ext.readBitmapFromExternalStorage
-import com.espressodev.gptmap.core.model.realm.RealmImageMessage
-import com.espressodev.gptmap.core.mongodb.ImageMessageRealmRepository
+import com.espressodev.gptmap.core.room.domain.repository.ImageMessageRoomRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.util.UUID
 import javax.inject.Inject
 
 class ImageMessageRepositoryImpl @Inject constructor(
-    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationContext private val context: Context,
+    @param:Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
+    @param:ApplicationContext private val context: Context,
     private val geminiRepository: GeminiRepository,
-    private val imageMessageRealmRepository: ImageMessageRealmRepository
+    private val imageMessageRoomRepository: ImageMessageRoomRepository,
 ) : ImageMessageRepository {
     override suspend fun addImageMessage(imageId: String, text: String): Result<Unit> =
         runCatchingWithContext(ioDispatcher) {
-            val realmImageMessage = RealmImageMessage().apply {
-                request = text
-            }
+            val imageMessage = ImageMessage(
+                id = UUID.randomUUID().toString(),
+                request = text,
+                response = "",
+                token = 0,
+                date = LocalDateTime.now()
+            )
 
             launch {
-                imageMessageRealmRepository.addImageMessageToImageAnalysis(
+                imageMessageRoomRepository.addImageMessageToImageAnalysis(
                     imageAnalysisId = imageId,
-                    message = realmImageMessage
+                    message = imageMessage
                 ).getOrThrow()
             }
 
@@ -55,9 +61,9 @@ class ImageMessageRepositoryImpl @Inject constructor(
             }
 
             val fullResponseText = stringBuilder.toString().trim()
-            imageMessageRealmRepository.updateImageMessageInImageAnalysis(
+            imageMessageRoomRepository.updateImageMessageInImageAnalysis(
                 imageAnalysisId = imageId,
-                messageId = realmImageMessage.id,
+                messageId = imageMessage.id,
                 text = fullResponseText,
                 token = totalToken
             ).getOrThrow()

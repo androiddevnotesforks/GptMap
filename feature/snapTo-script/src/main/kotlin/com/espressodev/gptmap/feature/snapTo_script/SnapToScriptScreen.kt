@@ -547,17 +547,6 @@ private fun TextFieldSection(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    val keyboardState by rememberKeyboardAsState()
-
-    var triggerSendLambda by remember { mutableStateOf(value = false) }
-
-    LaunchedEffect(key1 = triggerSendLambda) {
-        if (triggerSendLambda and !keyboardState.isVisible) {
-            onSendClick()
-            triggerSendLambda = false
-        }
-    }
-
     LaunchedEffect(key1 = inputSelector) {
         if (inputSelector == InputSelector.Keyboard) {
             focusRequester.requestFocus()
@@ -629,7 +618,8 @@ private fun TextFieldSection(
         )
 
         SendButton(isTextFieldEmpty) {
-            triggerSendLambda = true
+            focusManager.clearFocus()
+            onSendClick()
         }
     }
 }

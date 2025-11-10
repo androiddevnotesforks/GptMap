@@ -12,7 +12,7 @@ import com.espressodev.gptmap.core.model.FavouriteUiState
 import com.espressodev.gptmap.core.model.Response
 import com.espressodev.gptmap.core.model.di.Dispatcher
 import com.espressodev.gptmap.core.model.di.GmDispatchers.IO
-import com.espressodev.gptmap.core.mongodb.FavouriteRealmRepository
+import com.espressodev.gptmap.core.room.domain.repository.FavouriteRoomRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavouriteViewModel @Inject constructor(
-    private val favouriteRealmRepository: FavouriteRealmRepository,
+    private val favouriteRealmRepository: FavouriteRoomRepository,
     private val storageRepository: StorageRepository,
     logService: LogService,
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher

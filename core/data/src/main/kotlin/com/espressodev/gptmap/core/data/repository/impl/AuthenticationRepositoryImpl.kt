@@ -12,29 +12,25 @@ import com.espressodev.gptmap.core.model.di.GmDispatchers.IO
 import com.espressodev.gptmap.core.model.firebase.Provider
 import com.espressodev.gptmap.core.model.firebase.User
 import com.espressodev.gptmap.core.model.google.AuthState
-import com.espressodev.gptmap.core.mongodb.RealmAccountRepository
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
     private val accountService: AccountService,
     private val firestoreRepository: FirestoreRepository,
-    private val realmAccountRepository: RealmAccountRepository,
     private val googleAuthService: GoogleAuthService,
-    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
+    @param:Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ) : AuthenticationRepository {
     override fun signInUpWithGoogle(context: Context): Flow<AuthState<Unit>> = flow {
         googleAuthService.googleSignInUp(context).collect { state ->
             when (state) {
                 is AuthState.Success -> {
                     try {
-                        loginToRealm(state.data)
                         addUserToDatabaseIfUserIsNew(state.data)
                         emit(AuthState.Success(Unit))
                     } catch (e: Exception) {
@@ -57,8 +53,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
             val isEmailVerified = authResult.user?.isEmailVerified == true
             if (!isEmailVerified) throw Exceptions.FirebaseEmailVerificationIsFalseException()
-
-            loginToRealm(authResult)
         }
 
     override suspend fun signUpWithEmailAndPassword(
@@ -77,7 +71,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
             fullName = fullName
         )
         accountService.sendEmailVerification()
-        Unit
     }
 
     private suspend fun saveUserToDatabaseIfUserNotExist(
@@ -89,12 +82,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
             val id = authResult.user?.uid ?: throw Exceptions.FirebaseUserIdIsNullException()
             val user = User(userId = id, fullName = fullName, email = email)
             firestoreRepository.saveUser(user)
-        } ?: throw Exceptions.FirebaseUserIdIsNullException()
-    }
-
-    private suspend fun loginToRealm(authResult: AuthResult) {
-        authResult.user?.getIdToken(true)?.await()?.token?.let {
-            realmAccountRepository.loginWithEmail(it).getOrThrow()
         } ?: throw Exceptions.FirebaseUserIdIsNullException()
     }
 

@@ -8,7 +8,7 @@ import com.espressodev.gptmap.core.datastore.DataStoreService
 import com.espressodev.gptmap.core.domain.GetNextOrPrevFavouriteUseCase
 import com.espressodev.gptmap.core.firebase.FirestoreRepository
 import com.espressodev.gptmap.core.gemini.GeminiRepository
-import com.espressodev.gptmap.core.mongodb.FavouriteRealmRepository
+import com.espressodev.gptmap.core.room.domain.repository.FavouriteRoomRepository
 import com.espressodev.gptmap.core.unsplash.UnsplashRepository
 import com.espressodev.gptmap.feature.screenshot.ScreenshotServiceHandler
 import dagger.Module
@@ -46,10 +46,10 @@ object ViewModelModule {
     @ViewModelScoped
     @Provides
     fun provideDataService(
-        favouriteRealmRepository: FavouriteRealmRepository,
+        favouriteRoomRepository: FavouriteRoomRepository,
         firestoreRepository: FirestoreRepository,
         dataStoreService: DataStoreService
-    ): DataBundle = DataBundle(favouriteRealmRepository, firestoreRepository, dataStoreService)
+    ): DataBundle = DataBundle(favouriteRoomRepository, firestoreRepository, dataStoreService)
 
     @ViewModelScoped
     @Provides
@@ -70,7 +70,7 @@ data class RepositoryBundle(
 )
 
 data class DataBundle(
-    val favouriteRealmRepository: FavouriteRealmRepository,
+    val favouriteRealmRepository: FavouriteRoomRepository,
     val firestoreRepository: FirestoreRepository,
     val dataStoreService: DataStoreService
 )
